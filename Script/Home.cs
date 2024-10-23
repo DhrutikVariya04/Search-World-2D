@@ -1,15 +1,18 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Home : MonoBehaviour
 {
-    string[] AllStrings = { "HOME", "CARS", "DHRUTIK", "GAME", "ROOM" };
+    private string[] AllStrings = { "HOME", "CARS", "DHRUTIK", "GAME", "ROOM" };
+
+    private GameObject[][] TextStorage = new GameObject[7][];
 
     private System.Random random = new System.Random();
 
+    private bool Check = false;
+
     [SerializeField]
-    GameObject Question, Alphabet, space;
+    GameObject Question, Alphabet, space, AnswerSaw;
 
     // Start is called before the first frame update
     void Start()
@@ -21,17 +24,65 @@ public class Home : MonoBehaviour
 
         for (int i = 0; i < 7; i++)
         {
+            TextStorage[i] = new GameObject[6];
             for (int j = 0; j < 6; j++)
             {
-                GameObject A = Instantiate(Alphabet, space.transform);
-                A.GetComponent<Text>().text = GetRandomAlphabet()+"";
+                TextStorage[i][j] = Instantiate(Alphabet, space.transform);
+                TextStorage[i][j].GetComponent<Text>().text = GetRandomAlphabet() + "";
             }
-        }
+        }       
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(1))
+        {
+            Check = true;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            Check = false;
+
+            for (int i = 0; i < AllStrings.Length; i++)
+            {
+                if (AllStrings[i] == AnswerSaw.GetComponentInChildren<Text>().text)
+                {
+                    print(AllStrings[i] + " == >> " + AllStrings[i].Length);
+                }
+                else
+                {
+                    Debug.Log("Wrong Answer");
+                }
+
+                AnswerSaw.GetComponentInChildren<Text>().text = "";
+            }
+        }
+
+        if (Check)
+        {
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+            if (hit.collider != null)
+            {
+                /*for (int i = 0; i < 7; i++)
+                {
+                    for (int j = 0; j < 6; j++)
+                    {
+                       
+                    }
+                }*/
+
+                
+
+                /*AnswerSaw.GetComponentInChildren<Text>().text += hit.transform.GetComponent<Text>().text;
+                print(hit.transform.GetComponent<Text>().text);*/
+            }
+        }
 
     }
 
@@ -45,7 +96,7 @@ public class Home : MonoBehaviour
         return randomAlphabet;
     }
 
-    void RandomString(GameObject A,int j)
+    void RandomString(GameObject A, int j)
     {
         //Random.Range(0, AllStrings.Length)
         var selectedstring = AllStrings[2];

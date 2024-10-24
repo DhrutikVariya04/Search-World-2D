@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,18 +6,20 @@ public class Home : MonoBehaviour
 {
     private string[] AllStrings = { "HOME", "CARS", "DHRUTIK", "GAME", "ROOM" };
 
-    private GameObject[][] TextStorage = new GameObject[7][];
+    private GameObject[,] TextStorage = new GameObject[7, 6];
 
     private System.Random random = new System.Random();
 
     private bool Check = false;
+    private Vector2Int startPos = Vector2Int.zero, lastPos = new Vector2Int(-1, -1);
+
 
     [SerializeField]
     GameObject Question, Alphabet, space, AnswerSaw;
 
-    // Start is called before the first frame update
     void Start()
     {
+
         for (int i = 0; i < AllStrings.Length; i++)
         {
             Question.transform.GetChild(i).GetComponent<Text>().text = AllStrings[i];
@@ -24,22 +27,28 @@ public class Home : MonoBehaviour
 
         for (int i = 0; i < 7; i++)
         {
-            TextStorage[i] = new GameObject[6];
             for (int j = 0; j < 6; j++)
             {
-                TextStorage[i][j] = Instantiate(Alphabet, space.transform);
-                TextStorage[i][j].GetComponent<Text>().text = GetRandomAlphabet() + "";
+                TextStorage[i, j] = Instantiate(Alphabet, space.transform);
+                TextStorage[i, j].GetComponent<Text>().text = GetRandomAlphabet() + "";
+                TextStorage[i, j].name = $"{i},{j}";
+
             }
-        }       
+        }
 
     }
 
-    // Update is called once per frame
     void Update()
     {
+        print(startPos);
         if (Input.GetMouseButtonDown(1))
         {
             Check = true;
+
+            /*string OldPos = collider.gameObject.name;
+            string[] Pos = OldPos.Split(',');
+            startPos = new Vector2Int(int.Parse(Pos[0]), int.Parse(Pos[1]));
+            print(startPos);*/
         }
 
         if (Input.GetMouseButtonUp(1))
@@ -54,7 +63,7 @@ public class Home : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Wrong Answer");
+                    //Debug.Log("Wrong Answer");
                 }
 
                 AnswerSaw.GetComponentInChildren<Text>().text = "";
@@ -69,16 +78,24 @@ public class Home : MonoBehaviour
 
             if (hit.collider != null)
             {
-                /*for (int i = 0; i < 7; i++)
+                if (lastPos != new Vector2Int(-1, -1) && hit.collider.transform.tag != "Used")
                 {
-                    for (int j = 0; j < 6; j++)
+                    print("Enter");
+                    if (startPos.y == lastPos.y + 1)
                     {
-                       
+                        print("Horizonatal");
                     }
-                }*/
 
-                
-
+                    if (startPos.x == lastPos.x + 1)
+                    {
+                        print("vertical");
+                    }
+                }
+                else
+                {
+                    lastPos = startPos;
+                    hit.collider.transform.tag = "Used";
+                }
                 /*AnswerSaw.GetComponentInChildren<Text>().text += hit.transform.GetComponent<Text>().text;
                 print(hit.transform.GetComponent<Text>().text);*/
             }
@@ -88,17 +105,14 @@ public class Home : MonoBehaviour
 
     char GetRandomAlphabet()
     {
-        // Get a random number between 0 and 25
         int randomNumber = random.Next(0, 26);
 
-        // Convert the random number to a char ('A' is ASCII 65)
         char randomAlphabet = (char)('A' + randomNumber);
         return randomAlphabet;
     }
 
     void RandomString(GameObject A, int j)
     {
-        //Random.Range(0, AllStrings.Length)
         var selectedstring = AllStrings[2];
 
         A.GetComponent<Text>().text = selectedstring[j] + "";
